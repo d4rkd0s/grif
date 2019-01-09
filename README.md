@@ -1,4 +1,4 @@
-![grif logo][assets/grif.png]
+<img src="assets/grif.png" width="100" height="100">
 
 # Grif
 
