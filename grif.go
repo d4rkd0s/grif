@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"crypto/tls"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -19,37 +20,52 @@ import (
 )
 
 // Length in seconds between each cycle of checks
-var wait time.Duration = 10
+var wait time.Duration = 60
+var checking = false
 
 func main() {
-	fmt.Println("Grif v0.1")
+	fmt.Println("Grif v0.1 - https://github.com/d4rkd0s/grif (c) 2019 d4rkd0s")
 	if !checkForAdmin() {
 		os.Exit(126)
 	} else {
-		fmt.Println("Administrator command prompt achieved.")
+		fmt.Println("Administrator command prompt achieved")
 	}
+	checkAndCreateHostsFile()
+	fmt.Print("Enter number of seconds to wait between checking all hosts: ")
+	var i int
+	_, err := fmt.Scanf("%d", &i)
+	if err != nil {
+		log.Fatal(err)
+	}
+	wait = time.Duration(i)
 	for range time.Tick(wait * time.Second) {
-		go checkHosts()
+		if !checking {
+			go checkHosts()
+		} else {
+			fmt.Println("Busy checking hosts, waiting another cycle")
+		}
 	}
 }
 
 func checkHosts() {
+	checking = true
+	fmt.Println("Checking hosts...")
 	hosts, err := getHosts()
-	log.Println(hosts)
+	fmt.Println(hosts)
 	if err != nil {
 		log.Fatal(err)
 	}
 	for _, host := range hosts {
-		fmt.Println(host)
 		if strings.Contains(host, "http://") || strings.Contains(host, "https://") {
-			fmt.Println("Detected HTTP/S")
 			checkHTTP(host)
 		}
 		if strings.Contains(host, "icmp://") {
-			fmt.Println("Detected ICMP")
-			checkICMP(host)
+			fmt.Println("ICMP unsupported currently")
+			//  checkICMP(host)
 		}
 	}
+	fmt.Println("Done checking hosts")
+	checking = false
 }
 
 func getHosts() ([]string, error) {
@@ -72,7 +88,6 @@ func getHosts() ([]string, error) {
 
 func checkIfHostWasUp(host string) bool {
 	hosts, err := getHosts()
-	log.Println(hosts)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -90,7 +105,6 @@ func checkIfHostWasUp(host string) bool {
 
 func markHostDown(host string) {
 	hosts, err := getHosts()
-	log.Println(hosts)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -111,7 +125,6 @@ func markHostDown(host string) {
 
 func markHostUp(host string) {
 	hosts, err := getHosts()
-	log.Println(hosts)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -140,13 +153,23 @@ func alert(message string, host string) {
 		bark()
 		markHostDown(host)
 	}
+	// Wait 2 seconds before continuing to let the notifications pool up slowly
+	time.Sleep(2 * time.Second)
+	return
 }
 
 func checkHTTP(host string) {
 	if strings.HasPrefix(host, "#") {
 		host = trimFirstRune(host)
 	}
-	resp, err := http.Get(host)
+
+	//resp, err := http.Get(host)
+
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	}
+	client := &http.Client{Transport: tr}
+	resp, err := client.Get(host)
 	if err != nil {
 		fmt.Println(fmt.Sprintf("%s", err), host)
 		alert(fmt.Sprintf("%s", err), host)
@@ -217,6 +240,22 @@ func bark() {
 		close(playing)
 	})))
 	<-playing
+}
+
+func checkAndCreateHostsFile() bool {
+	_, err := os.Open("hosts")
+	if err != nil {
+		_, err2 := os.OpenFile("hosts", os.O_RDONLY|os.O_CREATE, 0666)
+		if err2 != nil {
+			fmt.Println("Unable to create hosts file in current directory, we have admin rights, so something must be wrong.")
+			log.Fatal(err2)
+		} else {
+			fmt.Println("Created hosts file in current directory")
+		}
+	} else {
+		fmt.Println("Detected hosts file in current directory")
+	}
+	return true
 }
 
 func checkForAdmin() bool {
