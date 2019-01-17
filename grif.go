@@ -3,11 +3,11 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"github.com/gen2brain/beeep"
 	"log"
+	"net/http"
 	"os"
 	"strings"
-
-	toast "gopkg.in/toast.v1"
 )
 
 func main() {
@@ -16,16 +16,16 @@ func main() {
 		log.Fatal(err)
 	}
 	for _, host := range hosts {
-		notify()
 		fmt.Println(host)
 		if strings.Contains(host, "http://") || strings.Contains(host, "https://") {
 			fmt.Println("Detected HTTP/S")
+			checkHTTP(host)
 		}
 		if strings.Contains(host, "icmp://") {
 			fmt.Println("Detected ICMP")
+			checkICMP(host)
 		}
 	}
-	notify()
 }
 
 func getHosts() ([]string, error) {
@@ -45,19 +45,26 @@ func getHosts() ([]string, error) {
 	return lines, scanner.Err()
 }
 
-func notify() {
-	notification := toast.Notification{
-		AppID:   "Grif",
-		Title:   "Grif has detected an outage",
-		Message: "Host icmp://8.8.8.8 didn't respond after 3 retries",
-		Icon:    "assets/grif.ico", // This file must exist (remove this line if it doesn't)
-		// Actions: []toast.Action{
-		// 	{"protocol", "Acknowledge", ""},
-		// 	{"protocol", "Ignore", ""},
-		// },
-	}
-	err := notification.Push()
+func notify(message string) {
+	err := beeep.Notify("Title", message, "assets/grif.png")
 	if err != nil {
-		log.Fatalln(err)
+		panic(err)
 	}
 }
+
+func checkHTTP(host string) {
+	resp, err := http.Get(host)
+	if err != nil {
+		notify(fmt.Sprintf("%s", err))
+	}
+	if resp.StatusCode >= 200 && resp.StatusCode <= 299 {
+		fmt.Println(fmt.Sprintf("%s replied with a 2xx", host))
+	} else {
+		notify(fmt.Sprintf("%s returned a non 2xx HTTP response", host))
+	}
+}
+
+func checkICMP(host string) {
+
+}
+
