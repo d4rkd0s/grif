@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 	"unicode/utf8"
@@ -16,13 +17,15 @@ import (
 	"github.com/faiface/beep/mp3"
 	"github.com/faiface/beep/speaker"
 	"github.com/gen2brain/beeep"
-	"github.com/sparrc/go-ping"
 	"github.com/getlantern/systray"
+	"github.com/sparrc/go-ping"
 )
 
 // Length in seconds between each cycle of checks
 var wait time.Duration = 3
 var checking = false
+var ready = false
+var numOfChecksRan uint32 = 0
 
 func main() {
 	fmt.Println("Grif v0.1 - https://github.com/d4rkd0s/grif (c) 2019 d4rkd0s")
@@ -32,7 +35,6 @@ func main() {
 		fmt.Println("Administrator command prompt achieved")
 	}
 	checkAndCreateHostsFile()
-
 	// Code to ask amount of delay
 	//
 	//fmt.Print("Enter number of seconds to wait between checking all hosts: ")
@@ -42,15 +44,7 @@ func main() {
 	//	log.Fatal(err)
 	//}
 	//wait = time.Duration(i)
-
 	systray.Run(onReady, onExit)
-	for range time.Tick(wait * time.Second) {
-		if !checking {
-			go checkHosts()
-		} else {
-			fmt.Println("Busy checking hosts, waiting another cycle")
-		}
-	}
 }
 
 func onReady() {
@@ -64,6 +58,21 @@ func onReady() {
 			case <-mQuit.ClickedCh:
 				systray.Quit()
 				return
+			}
+		}
+	}()
+
+	go func() {
+		for range time.Tick(wait * time.Second) {
+			if !ready {
+				go notify("Grif is now running")
+				bark()
+			}
+			ready = true
+			if !checking {
+				go checkHosts()
+			} else {
+				fmt.Println("Busy checking hosts, waiting another cycle")
 			}
 		}
 	}()
@@ -90,6 +99,7 @@ func checkHosts() {
 		log.Fatal(err)
 	}
 	for _, host := range hosts {
+		numOfChecksRan++
 		if strings.Contains(host, "http://") || strings.Contains(host, "https://") {
 			checkHTTP(host)
 		}
@@ -98,6 +108,7 @@ func checkHosts() {
 			//  checkICMP(host)
 		}
 	}
+	systray.SetTooltip(fmt.Sprintf("%s checks ran, %d hosts up, %d hosts down", strconv.Itoa(int(numOfChecksRan)), getCountOfUpHosts(), getCountOfDownHosts()))
 	fmt.Println("Done checking hosts")
 	checking = false
 }
@@ -118,6 +129,34 @@ func getHosts() ([]string, error) {
 		lines = append(lines, scanner.Text())
 	}
 	return lines, scanner.Err()
+}
+
+func getCountOfUpHosts() uint32 {
+	var numOfUpHosts uint32 = 0
+	var hosts, err = getHosts()
+	if err != nil {
+		log.Fatal(err)
+	}
+	for _, host := range hosts {
+		if !strings.HasPrefix(host, "#") {
+			numOfUpHosts++
+		}
+	}
+	return numOfUpHosts
+}
+
+func getCountOfDownHosts() uint32 {
+	var numOfDownHosts uint32 = 0
+	var hosts, err = getHosts()
+	if err != nil {
+		log.Fatal(err)
+	}
+	for _, host := range hosts {
+		if strings.HasPrefix(host, "#") {
+			numOfDownHosts++
+		}
+	}
+	return numOfDownHosts
 }
 
 func checkIfHostWasUp(host string) bool {
@@ -177,6 +216,17 @@ func markHostUp(host string) {
 	return
 }
 
+func notify(message string) {
+	// If the host is commented out, don't alert
+	err := beeep.Notify("Grif", message, "assets/grif.png")
+	if err != nil {
+		panic(err)
+	}
+	// Wait 2 seconds before continuing to let the notifications pool up slowly
+	time.Sleep(2 * time.Second)
+	return
+}
+
 func alert(message string, host string) {
 	// If the host is commented out, don't alert
 	if checkIfHostWasUp(host) {
@@ -186,6 +236,8 @@ func alert(message string, host string) {
 		}
 		bark()
 		markHostDown(host)
+		// TODO: Add downed hosts to list in right click menu
+		// If a user clicked a downed host, Grif will recheck (ie remove #)
 	}
 	// Wait 2 seconds before continuing to let the notifications pool up slowly
 	time.Sleep(2 * time.Second)
