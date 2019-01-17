@@ -23,3 +23,14 @@ https://twitter.com/
 ```
 
 and Grif will Ping the hosts that begin with icmp:// and test for a valid http response from the hosts with HTTP or HTTPS. Grif can also validate SSL if desired (this feature is being tested).
+
+
+## Building Grif
+
+In the main directory of this project run
+
+```
+go build -ldflags -H=windowsgui -o build/grif.exe
+```
+
+The files in the repo are already generated and in place to ensure the exe is built fully, with icon, manifest, etc.

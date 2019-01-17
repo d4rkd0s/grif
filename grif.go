@@ -17,10 +17,11 @@ import (
 	"github.com/faiface/beep/speaker"
 	"github.com/gen2brain/beeep"
 	"github.com/sparrc/go-ping"
+	"github.com/getlantern/systray"
 )
 
 // Length in seconds between each cycle of checks
-var wait time.Duration = 60
+var wait time.Duration = 3
 var checking = false
 
 func main() {
@@ -31,13 +32,18 @@ func main() {
 		fmt.Println("Administrator command prompt achieved")
 	}
 	checkAndCreateHostsFile()
-	fmt.Print("Enter number of seconds to wait between checking all hosts: ")
-	var i int
-	_, err := fmt.Scanf("%d", &i)
-	if err != nil {
-		log.Fatal(err)
-	}
-	wait = time.Duration(i)
+
+	// Code to ask amount of delay
+	//
+	//fmt.Print("Enter number of seconds to wait between checking all hosts: ")
+	//var i int
+	//_, err := fmt.Scanf("%d", &i)
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
+	//wait = time.Duration(i)
+
+	systray.Run(onReady, onExit)
 	for range time.Tick(wait * time.Second) {
 		if !checking {
 			go checkHosts()
@@ -45,6 +51,34 @@ func main() {
 			fmt.Println("Busy checking hosts, waiting another cycle")
 		}
 	}
+}
+
+func onReady() {
+	systray.SetIcon(getIcon("assets/grif.ico"))
+	systray.SetTitle("Grif")
+	systray.SetTooltip("Grif is running")
+	mQuit := systray.AddMenuItem("Quit", "Quits Grif")
+	go func() {
+		for {
+			select {
+			case <-mQuit.ClickedCh:
+				systray.Quit()
+				return
+			}
+		}
+	}()
+}
+
+func onExit() {
+	// Cleaning stuff here.
+}
+
+func getIcon(s string) []byte {
+	b, err := ioutil.ReadFile(s)
+	if err != nil {
+		fmt.Print(err)
+	}
+	return b
 }
 
 func checkHosts() {
