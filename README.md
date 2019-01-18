@@ -5,6 +5,8 @@
 Grif keeps you on top of the machines you are responsible for. 
 Without having to setup an entire monitoring system, or bother the ops team to monitor new hosts that may be temporary.
 
+<img src="samepl_alert.png" width="auto" height="100">
+
 ## Installation
 - Goto the Releases page here: https://github.com/d4rkd0s/grif/releases
 - Download the `grif_v***-windows.zip`, and extract all of the files to Documents or some place you want to run Grif from
