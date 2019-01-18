@@ -37,11 +37,11 @@ Grif will check the hosts for a valid http response from the hosts with HTTP or 
 In the main directory of this project get all of the dependencies
 ```
 go get -u github.com/faiface/beep
-go get -u	github.com/faiface/beep/mp3
-go get -u	github.com/faiface/beep/speaker
-go get -u	github.com/gen2brain/beeep
-go get -u	github.com/getlantern/systray
-go get -u	github.com/sparrc/go-ping
+go get -u github.com/faiface/beep/mp3
+go get -u github.com/faiface/beep/speaker
+go get -u github.com/gen2brain/beeep
+go get -u github.com/getlantern/systray
+go get -u github.com/sparrc/go-ping
 ```
 
 To run a build that moves to system tray run:
