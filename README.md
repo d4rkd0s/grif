@@ -6,11 +6,11 @@ Grif keeps you on top of the machines you are responsible for.
 Without having to setup an entire monitoring system, or bother the ops team to monitor new hosts that may be temporary.
 
 ## Installation
-- Goto the Releases page
-- Download .zip, and extract.
-- Edit hosts file (paste URLs to check, currently only http:// and https:// are available).
-- Grif will remake this file if its lost, as a demo https://github.com/ is placed in hosts by default on the downloaded version
-- Run grif.exe and look in your tray (Grif will bark when it's ready, and when it finds a host with problems)
+- Goto the Releases page here: https://github.com/d4rkd0s/grif/releases
+- Download the `grif_v***-windows.zip`, and extract all of the files to Documents or some place you want to run Grif from
+- Edit `hosts` file (add URLs to check, currently only http:// and https:// are available) if URLs end with variables or a slash it's okay Grif should handle this
+- Grif will remake the `hosts` file if its lost, as a demo https://github.com/ is placed in hosts by default on the downloaded version
+- Run `grif.exe` and look in your tray (Grif will bark when it's ready, and when it finds a host with problems)
 
 ## How it works
 
