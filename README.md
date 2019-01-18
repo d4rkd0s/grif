@@ -1,10 +1,11 @@
 <h1>
-  <img src="assets/grif.png" width="40" height="40">
+  <img src="assets/grif.png" width="60" height="60">
   Grif
-  <a href="https://twitter.com/intent/tweet?text=Grif%20keeps%20you%20on%20top%20of%20the%20machines%20you%20are%20responsible%20for.&url=https://github.com/d4rkd0s/grif&via=d4rkd0s&hashtags=monitoring,ops,golang,go,windows">
-    <img src="https://img.shields.io/twitter/url/http/shields.io.svg?style=social">
-  </a>
 </h1>
+
+<a href="https://twitter.com/intent/tweet?text=Grif%20keeps%20you%20on%20top%20of%20the%20machines%20you%20are%20responsible%20for.&url=https://github.com/d4rkd0s/grif&via=d4rkd0s&hashtags=monitoring,ops,golang,go,windows">
+  <img src="https://img.shields.io/twitter/url/http/shields.io.svg?style=social">
+</a>
 
 Grif keeps you on top of the machines you are responsible for. 
 Without having to setup an entire monitoring system, or bother the ops team to monitor new hosts that may be temporary.
