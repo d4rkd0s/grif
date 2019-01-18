@@ -1,8 +1,4 @@
-<img src="assets/grif.png" width="100" height="100">
-
-[![Tweet](https://img.shields.io/twitter/url/http/shields.io.svg?style=social)](https://twitter.com/intent/tweet?text=Grif%20keeps%20you%20on%20top%20of%20the%20machines%20you%20are%20responsible%20for.&url=https://github.com/d4rkd0s/grif&via=d4rkd0s&hashtags=monitoring,ops,golang,go,windows)
-
-# Grif
+# Grif [![Tweet](https://img.shields.io/twitter/url/http/shields.io.svg?style=social)](https://twitter.com/intent/tweet?text=Grif%20keeps%20you%20on%20top%20of%20the%20machines%20you%20are%20responsible%20for.&url=https://github.com/d4rkd0s/grif&via=d4rkd0s&hashtags=monitoring,ops,golang,go,windows)
 
 Grif keeps you on top of the machines you are responsible for. 
 Without having to setup an entire monitoring system, or bother the ops team to monitor new hosts that may be temporary.
