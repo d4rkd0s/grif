@@ -320,6 +320,16 @@ func bark() {
 	// Channel, which will signal the end of the playback.
 	playing := make(chan struct{})
 
+	// Grif volume to half
+	ctrl := &beep.Ctrl{Streamer: beep.Loop(-1, streamer), Paused: false}
+	volume := &effects.Volume{
+		Streamer: ctrl,
+		Base:     2,
+		Volume:   0,
+		Silent:   false,
+	}
+	volume.Volume += 0.5
+
 	// Now we Play our Streamer on the Speaker
 	speaker.Play(beep.Seq(s, beep.Callback(func() {
 		// Callback after the stream Ends
