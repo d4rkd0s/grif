@@ -30,7 +30,7 @@ jobs:
             libappindicator3-dev \
             qtbase5-private-dev
 
-    -run: echo 'en_US.UTF-8 UTF-8' >/etc/locale.gen && locale-gen
+    - run: echo 'en_US.UTF-8 UTF-8' >/etc/locale.gen && locale-gen
 
     - name: Set up Go
       uses: actions/setup-go@v2
