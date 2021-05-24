@@ -27,6 +27,7 @@ jobs:
             libchewing3-dev \
             libappindicator-dev \
             libappindicator3-dev \
+            libasound2-dev \
             qtbase5-private-dev
 
     - name: Set up Go
