@@ -18,7 +18,7 @@ import (
 	"github.com/faiface/beep/speaker"
 	"github.com/gen2brain/beeep"
 	"github.com/getlantern/systray"
-	"github.com/sparrc/go-ping"
+	"github.com/go-ping/ping"
 )
 
 // Length in seconds between each cycle of checks
@@ -361,4 +361,3 @@ func checkForAdmin() bool {
 	}
 	return true
 }
-
