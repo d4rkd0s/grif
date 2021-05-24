@@ -14,9 +14,8 @@ jobs:
     - uses: actions/checkout@v2
 
     - run: |
-        # base
-        apt update --yes && apt upgrade --yes
-        apt install --yes \
+        sudo apt update --yes && apt upgrade --yes
+        sudo apt install --yes \
             build-essential \
             locales \
             fakeroot \
