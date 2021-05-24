@@ -13,7 +13,8 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - run: |
+    - name: Install dependencies
+      run: |
         sudo apt update --yes && sudo apt upgrade --yes && sudo apt install --yes \
             build-essential \
             locales \
@@ -28,7 +29,8 @@ jobs:
             libappindicator3-dev \
             qtbase5-private-dev
 
-    - run: echo 'en_US.UTF-8 UTF-8' >/etc/locale.gen && locale-gen
+    - name: Update to US UTF-8 (for go build)
+      run: sudo echo 'en_US.UTF-8 UTF-8' >/etc/locale.gen && locale-gen
 
     - name: Set up Go
       uses: actions/setup-go@v2
